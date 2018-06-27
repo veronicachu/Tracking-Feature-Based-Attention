@@ -48,9 +48,10 @@ xlabs=(df:df:frange(2)+ceil(snrwidth));
 nbins=length(xlabs);
 
 data=mean(data,3);
-
 fcoefs=fft(data)/nsamps;
-fcoefs=2*abs(fcoefs((1:nbins)+1,:));
+% fcoefs=2*abs(fcoefs((1:nbins)+1,:));
+fcoefs=abs(fcoefs((1:nbins)+1,:));  % power
+% fcoefs=100*(fcoefs./(ones(size(fcoefs,1),1)*sum(fcoefs)));    % normpower
 fcoefs(:,badchans)=0;
 
 if avgchans; fcoefs=mean(fcoefs,2); end;
@@ -68,9 +69,9 @@ if snr;
     if logsnr; snrs=log10(snrs+1); output = logsnr; end;
     
     if isempty(linestyle)
-%         cortplotx(xlabs,snrs);
+        cortplotx(xlabs,snrs);
     else
-%         cortplotx(xlabs,snrs,linestyle);
+        cortplotx(xlabs,snrs,linestyle);
     end
     
     if logsnr
@@ -82,14 +83,14 @@ if snr;
     end
 else
     if isempty(linestyle)
-%         cortplotx(xlabs,fcoefs);
+        cortplotx(xlabs,fcoefs);
         output = fcoefs;
     else
-%         cortplotx(xlabs,fcoefs,linestyle);
+        cortplotx(xlabs,fcoefs,linestyle);
     end
     
-%     ylabel('SSR Amplitude (\muV)','fontsize',14);
-%     title('Steady-State Responses','fontsize',18);
+    ylabel('SSR Amplitude (\muV)','fontsize',14);
+    title('Steady-State Responses','fontsize',18);
 end
-% xlim(frange);
-% xlabel('Frequency (Hz)','fontsize',14);
+xlim(frange);
+xlabel('Frequency (Hz)','fontsize',14);

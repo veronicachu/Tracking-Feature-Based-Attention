@@ -1,24 +1,25 @@
 clear;
-subjnum = '423';
+subjnum = 302;
+blocknum = '4';
 
-file = sprintf('../Filtered Data Files/%s_FilteredEEG.mat',subjnum);
+file = sprintf('../Filtered Data Files/S%d/S%d-%s_FilteredEEG.mat',subjnum,subjnum,blocknum);
 load(file)
 
 % Settings for Segmented Data
 SecBeforeOnset = 2;
-SecAfterOnset = 7;
+SecAfterOnset = 6;
 SecAfterTrial = 2;
 startMod = Fs*SecBeforeOnset;
 endMod = Fs*SecAfterOnset-1;
 endBuffer = endMod + Fs*SecAfterTrial;
 
 % Get Photocell data
-pc = dataExp{1}.time_series(68,:)';
+pc = LSLData{1}.time_series(68,:)';
 
 % Filter PC data
 pcdata = filtereeg(pc,Fs,[1 30],[.25 60],10);
 
-% Zero out negative values from PC data
+% Zero out positive values from PC data
 pcdata(pcdata<0) = 0;
 
 % Plot PC Data
@@ -34,8 +35,8 @@ end
 start = sort(start);
 
 % Check
-% x = pcdata(start);
-% x = pcdata(start+1);
+x = pcdata(start);
+y = pcdata(start+1);
 
 %% Segment Data Exactly at Onset
 for i = 1:length(start) 
@@ -49,23 +50,19 @@ end
 close all
 
 %% Segmented Data with Time Before Onset
- 
 for i = 1:length(start)
     plot(pcdata(start(i)-startMod:start(i)+endBuffer))
     PrePCData(:,:,i) = pcdata(start(i)-startMod:start (i)+endBuffer);
     PreSegmentedEEG(:,:,i) = filteredEEG(start(i)-startMod:start(i)+endBuffer,:);
     
-    title(sprintf('Trial %d',i),'FontSize',20) 
+    title(sprintf('Trial %d',i),'FontSize',20)
     pause
 end
 close all
 
-badtrials = 0;
-% SegmentedEEG(:,:,badtrials) = 0;
-
 %% Save segmented EEG
-save(sprintf('%s_SegmentedEEG',subjnum),...
-   'nChan','Fs','start','startMod','endMod','endBuffer','badtrials',...
+save(sprintf('S%d-%s_SegmentedEEG',subjnum,blocknum),...
+   'nChan','Fs','start','SecBeforeOnset','SecAfterOnset','SecAfterTrial',...
    'PCData','SegmentedEEG','PrePCData','PreSegmentedEEG')
 
 

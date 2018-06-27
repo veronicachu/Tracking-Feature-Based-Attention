@@ -1,11 +1,10 @@
-clear;
-subjnum = '422';
+function preprocessEEG(subjnum,blocknum)
 
-file = sprintf('../Raw Data Files/%s_RawData.mat',subjnum);
+file = sprintf('../Raw Data Files/S%d/S%d-%d_RawData.mat',subjnum,subjnum,blocknum);
 load(file)
 
 % load the EEG data
-eeg = dataExp{1}.time_series;
+eeg = LSLData{1}.time_series;
 eeg = eeg(1:64,:)';
 
 % load the head model
@@ -41,10 +40,10 @@ plot(filteredEEG(:,64))
 
 %% Save the filtered EEG data
 
-save(sprintf('%s_FilteredEEG',subjnum),'dataExp',...
-   'nChan','Fs','filteredEEG')
+save(sprintf('S%d-%d_FilteredEEG',subjnum,blocknum),...
+    'LSLData','nChan','Fs','filteredEEG')
 
-
+end
 
 
 
