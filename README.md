@@ -1,4 +1,5 @@
-# SSVEP Analysis
+# Tracking Feature-Based Attention
+## SSVEP Analysis Code (Matlab)
 ### University of California, Irvine
 
 ### Author: Veronica C. Chu
