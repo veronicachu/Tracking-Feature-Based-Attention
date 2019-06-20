@@ -2,8 +2,7 @@
 ### University of California, Irvine
 
 ### Author: Veronica C. Chu
-#### [ResearchGate](https://www.researchgate.net/profile/Veronica_Chu)
-#### [Google Scholar](https://scholar.google.com/citations?user=yEuvW6MAAAAJ&hl=en&oi=sra)
+#### [ResearchGate](https://www.researchgate.net/profile/Veronica_Chu)	[Google Scholar](https://scholar.google.com/citations?user=yEuvW6MAAAAJ&hl=en&oi=sra)
 
 ----
 
