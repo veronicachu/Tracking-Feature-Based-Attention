@@ -1,5 +1,9 @@
 clear;
-load('TrialClassification_2freq_topchans.mat')
+load('TrialClassification_fulllength_topchans.mat')
+
+% Classification Type
+% type = 'linear';
+type = 'diagLinear';
 
 % Number of subjects
 names = fieldnames(classifyData);
@@ -40,36 +44,22 @@ for i = 1:nSubjs
         testData = kTrials.(names{i}){j};
         
         % Classify test dataset for current k-fold
-        [ldaClass_linear,err_linear(i,j),P_linear,logp_linear,coeff_linear] = ...
+        [class.(names{i}){j}, err.(names{i}){j}, posterior.(names{i}){j}, logp.(names{i}){j}, coeff.(names{i}){j}] = ...
             classify(testData(:,1:end-1),trainData(:,1:end-1),...
-            trainData(:,end),'diaglinear');
-        [ldaResubCM_linear{i}, grpOrder_linear] = confusionmat(testData(:,end),ldaClass_linear);
-    
-    % Calculate accuracy
-    acc(i,j) = trace(ldaResubCM_linear{i})/sum(sum(ldaResubCM_linear{i})) * 100;
+            trainData(:,end),type);
+        
+        % Create confusion matrix for classification results
+        [confusionmatrix.(names{i}){j}, grpOrder] = confusionmat(testData(:,end),class.(names{i}){j});
+        
+        % Calculate accuracy
+        acc(i,j) = trace(confusionmatrix.(names{i}){j})/sum(sum(confusionmatrix.(names{i}){j})) * 100;
     end
 end
 
-% disp(mean(acc))
+%% Save data
+save(sprintf('Car_Kfold_%s',type),'kTrials','class','err','posterior','logp','coeff',...
+    'confusionmatrix','grpOrder','acc')
 
-% scatter(1:20,(1-err_linear)*100)
-% ylim([0 100])
-
-%% Combine all trials for all subjects
-% data = classifyData.(names{1});
-% 
-% for i = 2:nSubjs
-%     data = [data; classifyData.(names{i})];
-% end
-
-%%
-figure;
-bar(1:20,acc')
-ylim([0 100])
-xlabel('Subject','FontSize',14)
-ylabel('Accuracy (%)','FontSize',14)
-title('Trial Classification','FontSize',16)
-% line([0 20],[70 70],'Color',[0.7 0.7 0.7],'LineStyle',':')
 
 %% Plot Scatter
 % for i = 1:nSubjs

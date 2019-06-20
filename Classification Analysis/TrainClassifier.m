@@ -1,5 +1,5 @@
 clear;
-load('TrialClassification_2freq_topchans.mat')
+load('TrialClassification_fulllength_topchans.mat')
 
 % Number of subjects
 names = fieldnames(classifyData);
@@ -15,13 +15,22 @@ nSubjs = length(names);
 % end
 
 %% trainClassifier_linearsvm_kfold_2freq.m
-acc = NaN(length(nSubjs));
-for i = 1:nSubjs
-    [~, acc(i),validationScores] = trainClassifier_linearsvm_kfold_2freq(classifyData.(names{i}));
+for i = 2:nSubjs
+    [trainedClassifier{i}, partitionedModel{i}, validationAccuracy{i}, validationPredictions{i}, validationScores{i}]...
+        = trainClassifier_linearsvm_kfold_2freq(classifyData.(names{i}));
+    
+    % Create confusion matrix for classification results
+    [confusionmatrix.(names{i}), grpOrder] = confusionmat(classifyData.(names{i})(:,end),validationPredictions{i});
+    
+    % Calculate accuracy
+    acc(i) = trace(confusionmatrix.(names{i}))/sum(sum(confusionmatrix.(names{i}))) * 100;
 end
 
-disp(mean(acc*100))
+disp(mean(cell2mat(validationAccuracy)*100))
 
+%%
+save('Car_Kfold_SVM','trainedClassifier','partitionedModel','validationAccuracy',...
+    'validationPredictions','validationScores','confusionmatrix','acc')
 
 
 

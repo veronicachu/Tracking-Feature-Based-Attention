@@ -1,7 +1,9 @@
-function CombineBlocks(subjnum)
+clear;
+subjnum = '123';
+
 %% Block 1
-disp('Getting data from Block A...')
-file = sprintf('S%d-1_SegmentedEEG.mat',subjnum);
+disp('Getting data from Block 1...')
+file = sprintf('%s-1_SegmentedEEG.mat',subjnum);
 load(file)
 
 % Exact onset
@@ -13,8 +15,8 @@ Block1_preEEG = PreSegmentedEEG;
 Block1_prePC = PrePCData;
 
 %% Block 2
-disp('Getting data from Block B...')
-file = sprintf('S%d-2_SegmentedEEG.mat',subjnum);
+disp('Getting data from Block 2...')
+file = sprintf('%s-2_SegmentedEEG.mat',subjnum);
 load(file)
 
 % Exact onset
@@ -27,7 +29,7 @@ Block2_prePC = PrePCData;
 
 %% Block 3
 disp('Getting data from Block 3...')
-file = sprintf('S%d-3_SegmentedEEG.mat',subjnum);
+file = sprintf('%s-3_SegmentedEEG.mat',subjnum);
 load(file)
 
 % Exact onset
@@ -40,7 +42,7 @@ Block3_prePC = PrePCData;
 
 %% Block 4
 disp('Getting data from Block 4...')
-file = sprintf('S%d-4_SegmentedEEG.mat',subjnum);
+file = sprintf('%s-4_SegmentedEEG.mat',subjnum);
 load(file)
 
 % Exact onset
@@ -57,33 +59,32 @@ clear PCData SegmentedEEG PrePCData PreSegmentedEEG
 
 % Exact onset EEG
 SegmentedEEG = Block1_EEG;
-SegmentedEEG(:,:,65:128) = Block2_EEG;
-SegmentedEEG(:,:,129:192) = Block3_EEG;
-SegmentedEEG(:,:,193:256) = Block4_EEG;
+SegmentedEEG(:,:,33:64) = Block2_EEG;
+SegmentedEEG(:,:,65:96) = Block3_EEG;
+SegmentedEEG(:,:,97:128) = Block4_EEG;
 
 % Exact onset PC
 PCData = Block1_PC;
-PCData(:,:,65:128) = Block2_PC;
-PCData(:,:,129:192) = Block3_PC;
-PCData(:,:,193:256) = Block4_PC;
+PCData(:,:,33:64) = Block2_PC;
+PCData(:,:,65:96) = Block3_PC;
+PCData(:,:,97:128) = Block4_PC;
 
 % Pre onset EEG
 PreSegmentedEEG = Block1_preEEG;
-PreSegmentedEEG(:,:,65:128) = Block2_preEEG;
-PreSegmentedEEG(:,:,129:192) = Block3_preEEG;
-PreSegmentedEEG(:,:,193:256) = Block4_preEEG;
+PreSegmentedEEG(:,:,33:64) = Block2_preEEG;
+PreSegmentedEEG(:,:,65:96) = Block3_preEEG;
+PreSegmentedEEG(:,:,97:128) = Block4_preEEG;
 
 % Exact onset PC
 PrePCData = Block1_prePC;
-PrePCData(:,:,65:128) = Block2_prePC;
-PrePCData(:,:,129:192) = Block3_prePC;
-PrePCData(:,:,193:256) = Block4_prePC;
+PrePCData(:,:,33:64) = Block2_prePC;
+PrePCData(:,:,65:96) = Block3_prePC;
+PrePCData(:,:,97:128) = Block4_prePC;
 
 
 %% Save file
 disp('Saving data...')
-save(sprintf('S%d_SegmentedEEG',subjnum),...
+save(sprintf('%s_SegmentedEEG',subjnum),...
    'nChan','Fs','SecBeforeOnset','SecAfterOnset','SecAfterTrial',...
    'PCData','SegmentedEEG','PrePCData','PreSegmentedEEG')
 
-end

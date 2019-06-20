@@ -48,10 +48,9 @@ xlabs=(df:df:frange(2)+ceil(snrwidth));
 nbins=length(xlabs);
 
 data=mean(data,3);
+
 fcoefs=fft(data)/nsamps;
-% fcoefs=2*abs(fcoefs((1:nbins)+1,:));
-fcoefs=abs(fcoefs((1:nbins)+1,:));  % power
-% fcoefs=100*(fcoefs./(ones(size(fcoefs,1),1)*sum(fcoefs)));    % normpower
+fcoefs=2*abs(fcoefs((1:nbins)+1,:));
 fcoefs(:,badchans)=0;
 
 if avgchans; fcoefs=mean(fcoefs,2); end;

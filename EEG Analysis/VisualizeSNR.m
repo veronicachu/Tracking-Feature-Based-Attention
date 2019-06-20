@@ -57,7 +57,7 @@ boxplot(RF1data)
 
 xticklabels({'12.5Hz','18.75Hz','25Hz','37.5Hz'});
 ylabel('SNR Values','FontSize',14)
-ylim([-0.5 18])
+ylim([-0.5 10])
 title('Blue Freq 12.5Hz','FontSize',20)
 
 subplot(2,2,2)
@@ -65,7 +65,7 @@ boxplot(RF2data)
 
 xticklabels({'12.5Hz','18.75Hz','25Hz','37.5Hz'});
 ylabel('SNR Values','FontSize',14)
-ylim([-0.5 18])
+ylim([-0.5 10])
 title('Blue Freq 18.75Hz','FontSize',20)
 
 subplot(2,2,3)
@@ -73,7 +73,7 @@ boxplot(GF1data)
 
 xticklabels({'12.5Hz','18.75Hz','25Hz','37.5Hz'});
 ylabel('SNR Values','FontSize',14)
-ylim([-0.5 18])
+ylim([-0.5 10])
 title('Green Freq 12.5Hz','FontSize',20)
 
 subplot(2,2,4)
@@ -81,7 +81,7 @@ boxplot(GF2data)
 
 xticklabels({'12.5Hz','18.75Hz','25Hz','37.5Hz'});
 ylabel('SNR Values','FontSize',14)
-ylim([-0.5 18])
+ylim([-0.5 10])
 title('Green Freq 18.75Hz','FontSize',20)
 
 
@@ -94,8 +94,8 @@ gscatter(training(:,1),training(:,2),group,'bg','s',7,'off')    % 12.5 and 18.75
 legend('12.5Hz','18.75Hz',...
        'Location','NE')
 
-xlim([0 18])
-ylim([0 18])
+xlim([0 10])
+ylim([0 10])
 xlabel('SNR at 12.5Hz ','FontSize',14)
 ylabel('SNR at 18.75Hz','FontSize',14)
 title('Frequency Classification','FontSize',20)

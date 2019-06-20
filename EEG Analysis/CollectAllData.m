@@ -3,13 +3,14 @@ clear;
 %% Grab each subject's EEG data
 cd ('Segmented Data Files')
 files = dir;
-nFiles = length(files);
+nSubfiles = [files.isdir];
 subfiles = {files.name};
 
 % Find all subfolders in 'Segmented Data Files'
 a = 1;
+subjs = cell(1,sum(nSubfiles)-2);
 for i = 1:length(subfiles)
-    if ~isempty(cell2mat(strfind(subfiles(i),'SegmentedEEG')))
+    if ~isempty(cell2mat(strfind(subfiles(i),'Subj')))
         subjs{a} = subfiles{i};
         a = a + 1;
     end
@@ -18,15 +19,22 @@ end
 % Go into each subfolder to get subject's data and place into struct
 disp('Creating EEG struct...')
 for i = 1:length(subjs)
-    fprintf('Grabbing %s...\n',subjs{i})
-    subjnum = subjs{i}(1:end-17);
+    fprintf('Grabbing %s_SegmentedEEG.mat...\n',subjs{i})
+    cd(subjs{i})
+    subjnum = subjs{i}(end-2:end);
     load(sprintf('%s_SegmentedEEG.mat',subjnum));
     name = sprintf('S%s',subjnum);
+    
     Data.(name).SegmentedEEG = SegmentedEEG;
     Data.(name).PCData = PCData;
     Data.(name).PreSegmentedEEG = PreSegmentedEEG;
     Data.(name).PrePCData = PrePCData;
-    Data.(name).badtrials = badtrials;
+    
+    Data.(name).SecBeforeOnset = SecBeforeOnset;
+    Data.(name).SecAfterOnset = SecAfterOnset;
+    Data.(name).SecAfterTrial = SecAfterTrial;
+    
+    cd ..
 end
 cd ..
 
@@ -60,4 +68,4 @@ cd ('../EEG Analysis')
 %%
 
 disp('Saving data...')
-save('AllSubjData2','Data','-v7.3')
+save('AllSubjData','Data','-v7.3')

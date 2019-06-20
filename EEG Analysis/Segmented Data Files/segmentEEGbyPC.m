@@ -1,79 +1,77 @@
-clear;
-subjnum = '417';
+% !!Warning!! Is not accurate in determining start
 
-file = sprintf('../Filtered Data Files/%s_FilteredEEG.mat',subjnum);
+clear;
+subjnum = '102';
+trialnum = '102-1';
+
+file = sprintf('../Filtered Data Files/Subj %s/%s_FilteredEEG.mat',subjnum,trialnum);
 load(file)
 
+% Settings for Segmented Data
+SecBeforeOnset = 3;
+SecAfterOnset = 8;
+startMod = Fs*SecBeforeOnset;
+endMod = Fs*SecAfterOnset-1;
+
+% Get Photocell data
 pc = dataExp{1}.time_series(68,:)';
 
-% Filter Photocell data
+% Filter PC data
 pcdata = filtereeg(pc,Fs,[1 30],[.25 60],10);
-% pcdata = filtereeg(pc,Fs);
 
-%% Find start/stop flicker using Photocell data
-pcdata(pcdata > 0) = 0;
-% plot(pcdata)
+% Zero out negative values from PC data
+pcdata(pcdata<0) = 0;
 
-% find when flicker starts
-pc = zeros(Fs*6,1,128);
-eeg = zeros(Fs*6,64,128);
-for i = 1:128
-    pc(:,:,i) = pcdata(estimate(i):estimate(i)+Fs*6-1);
-    eeg(:,:,i) = filteredEEG(estimate(i):estimate(i)+Fs*6-1,:);
-end
+%% Find exact start of PC
+start = extractbyPC(pcdata,200,64);     % pcdata, expected buffer, # of trials x 2
 
-% Check
-% for i = 1:128
-%     plot(pc(:,:,i))
-%     disp(i)
-%     pause
-% end
-
-%% Find first number less than -25 for all trials
-start = zeros(1,size(pc,3));
-for i = 1:size(pc,3)
-    temp = find(pc(:,:,i) < -25);
-    temp2 = find(pc(1:temp(1),:,i) == 0);
-    last = length(temp2);
+%% Find actual trials
+clc
+for i = 1:length(start)-1
+    plot(pcdata(start(i):start(i)+Fs*8))
     
-    start(i) = temp2(last);
+    uicontrol('Style','pushbutton','String','Yes',...
+        'Position', [20 140 50 40],...
+        'Callback',{@pushbutton_callback,i});
+    title(sprintf('Start #%d',i),'FontSize',20)
+    pause
 end
+close all
 
-% Check
-for i = 1:128
-%     hold on
-    plot(pc(:,:,i))
+%% Filter out actual trials
+actual = xlsread(sprintf('Subj %s Actual Start',trialnum));
+start2 = start(actual);
+
+%% Segment Data Exactly at Onset
+for i = 1:length(start2)
+    plot(pcdata(start2(i):start2(i)+endMod))
+    PCData(:,:,i) = pcdata(start2(i):start2(i)+endMod);
+    SegmentedEEG(:,:,i) = filteredEEG(start2(i):start2(i)+endMod,:);
+    
+    title(sprintf('Trial %d',i),'FontSize',20)
+    pause 
+end
+close all
+
+%% Segmented Data with Time Before Onset
+ 
+for i = 1:length(start2)
+    plot(pcdata(start2(i)-startMod:start2(i)+endMod))
+    PrePCData(:,:,i) = pcdata(start2(i)-startMod:start2 (i)+endMod);
+    PreSegmentedEEG(:,:,i) = filteredEEG(start2(i)-startMod:start2(i)+endMod,:);
+    
     title(sprintf('Trial %d',i),'FontSize',20)
     pause
 end
+close all
 
-% Check for one frequency
-x = find(TrialData.GreenFreq == 7.5);
-for i = 1:length(x)
-    hold on
-    j = x(i);
-    plot(pc(start(j):start(j)+1024*6-1,:,j))
-    disp(i)
-%     pause
-end
-
-% start(9) = start(9) + 755;
-
-%% Trim EEG data using Photocell data (full 6 sec)
-for i = 1:size(eeg,3)
-    SegmentedEEG(:,:,i) = eeg(start(i):start(i)+1024*6-1,1:64,i);
-end
-
-% % Segment for before trial - 3 sec before
-% for i = 1:size(eeg,3)
-%     BaslineEEG(:,:,i) = eeg(start(i)-Fs*3:start(i)-1,1:64,i);
-% end
+badtrials = 0;
+% SegmentedEEG(:,:,badtrials) = 0;
 
 %% Save segmented EEG
-save(sprintf('%s_SegmentedEEG',subjnum),...
-   'nChan','Fs','SegmentedEEG','pc','start','badtrials')
-
-
+save(sprintf('%s_SegmentedEEG',trialnum),...
+   'nChan','Fs','start','startMod','endMod','badtrials',...
+   'PCData','SegmentedEEG','PrePCData','PreSegmentedEEG')
 
 
 

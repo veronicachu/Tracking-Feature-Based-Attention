@@ -20,10 +20,10 @@ targChans = [topChans];
 names = fieldnames(Data);
 
 % Pre-allocate matricies
-RF1SNR1 = zeros(216,length(targChans),length(names));
-RF2SNR1 = zeros(216,length(targChans),length(names));
-GF1SNR1 = zeros(216,length(targChans),length(names));
-GF2SNR1 = zeros(216,length(targChans),length(names));
+RF1SNR1 = zeros(432,length(targChans),length(names));
+RF2SNR1 = zeros(432,length(targChans),length(names));
+GF1SNR1 = zeros(432,length(targChans),length(names));
+GF2SNR1 = zeros(432,length(targChans),length(names));
 
 for i = 1:length(names)
     fprintf('Calculating SNR for %s...\n', names{i})
@@ -34,10 +34,10 @@ for i = 1:length(names)
     
     % Split EEG data in half
 %     EEG = SegmentedEEG(1:end-Fs*1,:,:);
-    EEG1 = SegmentedEEG(Fs*2:end-Fs-1,:,1:32);
-    EEG2 = SegmentedEEG(Fs*2:end-Fs-1,:,33:64);
-    EEG3 = SegmentedEEG(Fs*2:end-Fs-1,:,65:96);
-    EEG4 = SegmentedEEG(Fs*2:end-Fs-1,:,97:128);
+    EEG1 = SegmentedEEG(1:Fs*8,:,1:32);
+    EEG2 = SegmentedEEG(1:Fs*8,:,33:64);
+    EEG3 = SegmentedEEG(1:Fs*8,:,65:96);
+    EEG4 = SegmentedEEG(1:Fs*8,:,97:128);
     badtrials = 0;
     
     % Segment by condition
@@ -97,28 +97,29 @@ GF2SNR_mean3 = squeeze(mean(GF2SNR3,2));
 GF2SNR_mean4 = squeeze(mean(GF2SNR4,2));
 
 %%
+% remove nans
 freq1bin = find(bin == 12.5);
 freq2bin = find(bin == 18.75);
 
-RF1att_Block1 = mean(RF1SNR_mean1(freq1bin,:)) / mean(RF1SNR_mean1(freq2bin,:));
-RF1att_Block2 = mean(RF1SNR_mean2(freq1bin,:)) / mean(RF1SNR_mean2(freq2bin,:));
-RF1att_Block3 = mean(RF1SNR_mean3(freq1bin,:)) / mean(RF1SNR_mean3(freq2bin,:));
-RF1att_Block4 = mean(RF1SNR_mean4(freq1bin,:)) / mean(RF1SNR_mean4(freq2bin,:));
+RF1att_Block1 = mean(RF1SNR_mean1(freq1bin,:),'omitnan') / mean(RF1SNR_mean1(freq2bin,:),'omitnan');
+RF1att_Block2 = mean(RF1SNR_mean2(freq1bin,:),'omitnan') / mean(RF1SNR_mean2(freq2bin,:),'omitnan');
+RF1att_Block3 = mean(RF1SNR_mean3(freq1bin,:),'omitnan') / mean(RF1SNR_mean3(freq2bin,:),'omitnan');
+RF1att_Block4 = mean(RF1SNR_mean4(freq1bin,:),'omitnan') / mean(RF1SNR_mean4(freq2bin,:),'omitnan');
 
-RF2att_Block1 = mean(RF2SNR_mean1(freq2bin,:)) / mean(RF2SNR_mean1(freq1bin,:));
-RF2att_Block2 = mean(RF2SNR_mean2(freq2bin,:)) / mean(RF2SNR_mean2(freq1bin,:));
-RF2att_Block3 = mean(RF2SNR_mean3(freq2bin,:)) / mean(RF2SNR_mean3(freq1bin,:));
-RF2att_Block4 = mean(RF2SNR_mean4(freq2bin,:)) / mean(RF2SNR_mean4(freq1bin,:));
+RF2att_Block1 = mean(RF2SNR_mean1(freq2bin,:),'omitnan') / mean(RF2SNR_mean1(freq1bin,:),'omitnan');
+RF2att_Block2 = mean(RF2SNR_mean2(freq2bin,:),'omitnan') / mean(RF2SNR_mean2(freq1bin,:),'omitnan');
+RF2att_Block3 = mean(RF2SNR_mean3(freq2bin,:),'omitnan') / mean(RF2SNR_mean3(freq1bin,:),'omitnan');
+RF2att_Block4 = mean(RF2SNR_mean4(freq2bin,:),'omitnan') / mean(RF2SNR_mean4(freq1bin,:),'omitnan');
 
-GF1att_Block1 = mean(GF1SNR_mean1(freq1bin,:)) / mean(GF1SNR_mean1(freq2bin,:));
-GF1att_Block2 = mean(GF1SNR_mean2(freq1bin,:)) / mean(GF1SNR_mean2(freq2bin,:));
-GF1att_Block3 = mean(GF1SNR_mean3(freq1bin,:)) / mean(GF1SNR_mean3(freq2bin,:));
-GF1att_Block4 = mean(GF1SNR_mean4(freq1bin,:)) / mean(GF1SNR_mean4(freq2bin,:));
+GF1att_Block1 = mean(GF1SNR_mean1(freq1bin,:),'omitnan') / mean(GF1SNR_mean1(freq2bin,:),'omitnan');
+GF1att_Block2 = mean(GF1SNR_mean2(freq1bin,:),'omitnan') / mean(GF1SNR_mean2(freq2bin,:),'omitnan');
+GF1att_Block3 = mean(GF1SNR_mean3(freq1bin,:),'omitnan') / mean(GF1SNR_mean3(freq2bin,:),'omitnan');
+GF1att_Block4 = mean(GF1SNR_mean4(freq1bin,:),'omitnan') / mean(GF1SNR_mean4(freq2bin,:),'omitnan');
 
-GF2att_Block1 = mean(GF2SNR_mean1(freq2bin,:)) / mean(GF2SNR_mean1(freq1bin,:));
-GF2att_Block2 = mean(GF2SNR_mean2(freq2bin,:)) / mean(GF2SNR_mean2(freq1bin,:));
-GF2att_Block3 = mean(GF2SNR_mean3(freq2bin,:)) / mean(GF2SNR_mean3(freq1bin,:));
-GF2att_Block4 = mean(GF2SNR_mean4(freq2bin,:)) / mean(GF2SNR_mean4(freq1bin,:));
+GF2att_Block1 = mean(GF2SNR_mean1(freq2bin,:),'omitnan') / mean(GF2SNR_mean1(freq1bin,:),'omitnan');
+GF2att_Block2 = mean(GF2SNR_mean2(freq2bin,:),'omitnan') / mean(GF2SNR_mean2(freq1bin,:),'omitnan');
+GF2att_Block3 = mean(GF2SNR_mean3(freq2bin,:),'omitnan') / mean(GF2SNR_mean3(freq1bin,:),'omitnan');
+GF2att_Block4 = mean(GF2SNR_mean4(freq2bin,:),'omitnan') / mean(GF2SNR_mean4(freq1bin,:),'omitnan');
 
 figure;
 subplot(2,2,1)

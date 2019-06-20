@@ -14,10 +14,12 @@ chanNames = ANTWAVE64.ChanNames;
 actualfreq1 = 12.5;
 actualfreq2 = 18.75;
 
-EEG = SegmentedEEG(Fs*2:end-Fs-1,:,:);
+EEG1 = SegmentedEEG(1:Fs*4,:,:);
+EEG2 = SegmentedEEG(Fs*4+1:end,:,:);
 
 %% Segment by condition
-[redF1EEG,redF2EEG,greenF1EEG,greenF2EEG] = extractTrialType(EEG,TrialData,actualfreq1,actualfreq2,badtrials);
+[redF1EEG,redF2EEG,greenF1EEG,greenF2EEG] = extractTrialType(EEG1,TrialData,actualfreq1,actualfreq2,badtrials);
+[redF1EEG(:,:,33:64),redF2EEG(:,:,33:64),greenF1EEG(:,:,33:64),greenF2EEG(:,:,33:64)] = extractTrialType(EEG2,TrialData,actualfreq1,actualfreq2,badtrials);
 
 %% 
 parietalChans = [29 55:58 63:64];

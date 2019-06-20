@@ -1,5 +1,5 @@
 clear;
-load('SNRDataTrials_topchan.mat')
+load('SNRDataTrials_fulllength_topchans.mat')
 
 %% Properties
 % Number of subjects
@@ -7,7 +7,7 @@ names = fieldnames(FFTData);
 nSubjs = length(names);
 
 % Target freqs
-bin = FFTData.S402.bin;
+bin = FFTData.S102.bin;
 freq1 = find(bin == 12.5);
 % freq1_2nd = find(bin == 25);
 freq2 = find(bin == 18.75);
@@ -54,7 +54,7 @@ end
 for i = 1:nSubjs
     classifyData.(names{i}) = [RF1_trials.(names{i}); RF2_trials.(names{i}); GF1_trials.(names{i}); GF2_trials.(names{i})];
     [nanrow,nancol] = find(isnan(classifyData.(names{i})));
-    classifyData.(names{i})(nanrow,:) = [];
+    classifyData.(names{i})(:,nancol) = [];
 end
 
 %% Combine all trials for all subjects
@@ -66,7 +66,7 @@ end
 
 %% Save data file
 
-save('TrialClassification_2freq_topchans','classifyData')
+save('TrialClassification_fulllength_topchans','classifyData')
 
 
 

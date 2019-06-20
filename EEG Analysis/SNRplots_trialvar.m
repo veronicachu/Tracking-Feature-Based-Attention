@@ -1,5 +1,5 @@
 clear;
-load('SNRDataTrials.mat')
+load('SNRDataTrials_correct.mat')
 
 %% 
 
@@ -30,16 +30,16 @@ for i = 1:length(names)
     
     % Collect subject's data
     bin = FFTData.(names{i}).bin;
-    RF1 = FFTData.(names{i}).RF1SNR(:,7,:);
-    RF2 = FFTData.(names{i}).RF2SNR(:,7,:);
-    GF1 = FFTData.(names{i}).GF1SNR(:,7,:);
-    GF2 = FFTData.(names{i}).GF2SNR(:,7,:);
+    RF1 = FFTData.(names{i}).RF1SNR(:,7,1:32);
+    RF2 = FFTData.(names{i}).RF2SNR(:,7,1:32);
+    GF1 = FFTData.(names{i}).GF1SNR(:,7,1:32);
+    GF2 = FFTData.(names{i}).GF2SNR(:,7,1:32);
     
     % Channel Mean
-    meanRF1 = squeeze(mean(RF1,2));
-    meanRF2 = squeeze(mean(RF2,2));
-    meanGF1 = squeeze(mean(GF1,2));
-    meanGF2 = squeeze(mean(GF2,2));
+    meanRF1 = squeeze(nanmean(RF1,2));
+    meanRF2 = squeeze(nanmean(RF2,2));
+    meanGF1 = squeeze(nanmean(GF1,2));
+    meanGF2 = squeeze(nanmean(GF2,2));
     
     % Plot SNR
     h = figure('units','normalized','outerposition',[0 0 1 1]);
@@ -81,7 +81,7 @@ for i = 1:length(names)
     line([12.5 12.5],[0 5],'LineStyle','--','Color','k')
     line([18.75 18.75],[0 5],'LineStyle','--','Color','k')
     
-    saveas(h,sprintf('Figures/%s SNR_Oz.png', names{i}))
+    saveas(h,sprintf('Figures/%s SNR.png', names{i}))
 end
 
-close all
+% close all

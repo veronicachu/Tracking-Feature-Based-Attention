@@ -1,14 +1,14 @@
-function [pc,eeg] = extractTrials(dataExp,filteredEEG,pcdata)
+function [pc,eeg] = extractTrials(dataExp,filteredEEG,pcdata,nTrials)
 
-[beginMkr,~,~,~,~,~,endMkr] = extractMarkerTimes(dataExp);
+[beginMkr,~,~,~,~,endMkr] = extractMarkerTimes(dataExp);
 amptime = dataExp{1}.time_stamps;
 nTime = length(amptime);
 
 %% Find indices that match Unity time to amp time
 a = 1;
-beginIdx = zeros(1,128);
+beginIdx = zeros(1,nTrials);
 for i = 2:nTime-1
-    if a > 128
+    if a > nTrials
         continue
     elseif a == 1 && round(amptime(i-1),3) ~= round(beginMkr(a),3) && round(amptime(i),3) == round(beginMkr(a),3)
         beginIdx(a) = i; 
@@ -20,9 +20,9 @@ for i = 2:nTime-1
 end
 
 a = 1;
-endIdx = zeros(1,128);
+endIdx = zeros(1,nTrials);
 for i = 2:nTime-1
-    if a > 128
+    if a > nTrials
         continue
     elseif round(amptime(i-1),3) ~= round(endMkr(a),3) && round(amptime(i),3) == round(endMkr(a),3)
         endIdx(a) = i+3500;
@@ -31,7 +31,7 @@ for i = 2:nTime-1
 end
 
 %% Find size of photocell matrix
-differences = ones(1,128);
+differences = ones(1,nTrials);
 for i = 1:length(beginIdx)
     differences(i) = endIdx(i) - beginIdx(i);
 end
@@ -50,7 +50,7 @@ for k = 1:nTrials
 end
 
 %% Find size of EEG matrix
-differences = ones(1,128);
+differences = ones(1,nTrials);
 for i = 1:length(beginIdx)
     differences(i) = endIdx(i) - beginIdx(i);
 end

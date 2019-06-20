@@ -1,125 +1,181 @@
 clear;
-subjnum = 302;
+subjnum = '102';
 
-% eegfile = sprintf('Segmented Data Files/S%d/S%d-Cond%d_SegmentedEEG.mat',subjnum,subjnum,condnum);
-eegfile = sprintf('Segmented Data Files/S%d/S%d_SegmentedEEG.mat',subjnum,subjnum);
+% eegfile = sprintf('Segmented Data Files/Subj %s/Old Data 2/%s_SegmentedEEG.mat',subjnum,subjnum);
+% eegfile = sprintf('Segmented Data Files/Subj %s/%s_SegmentedEEG.mat',subjnum,subjnum);
+eegfile = sprintf('Cleaned Data Files/%s_CleanedEEG.mat',subjnum);
 load(eegfile)
 
-% behfile = sprintf('../Behavioral Analysis/%d_TrialData_Cond%d.mat',subjnum,condnum);
-behfile = sprintf('../Behavioral Analysis/S%d_TrialData.mat',subjnum);
+behfile = sprintf('D:/Grad School/Research//CNS Lab/Projects/SSVEP Car/3_Data Analysis/Task/Behavioral Analysis/%s_ColorData.mat',subjnum);
 load(behfile);
 
-freqs = [12 15];
+actualfreq1 = 12.5;
+actualfreq2 = 18.75;
 Fs = 1024;
 
-%%
-EEG = SegmentedEEG(Fs*1:Fs*5-1,:,:);
+% EEG1 = SegmentedEEG(1:Fs*4,:,:);
+% EEG2 = SegmentedEEG(Fs*4+1:end,:,:);
+EEG1 = data(1:Fs*4,:,:);
+EEG2 = data(Fs*4+1:Fs*8,:,:);
+
 badtrials = 0;
-
-%% Separate by condition
-[trialsepData] = extractTrialType(EEG,TrialData,freqs);
-
-%% Calculate SNR
-% Congruent
-rightRF1EEG = trialsepData.rightRF1EEG;
-rightRF2EEG = trialsepData.rightRF2EEG;
-leftLF1EEG = trialsepData.leftLF1EEG;
-leftLF2EEG = trialsepData.leftLF2EEG;
-
-[bin,rightRF1SNR] = plotSSR_mod(rightRF1EEG,Fs,'snr',1);
-[~,rightRF2SNR] = plotSSR_mod(rightRF2EEG,Fs,'snr',1);
-[~,leftLF1SNR] = plotSSR_mod(leftLF1EEG,Fs,'snr',1);
-[~,leftLF2SNR] = plotSSR_mod(leftLF2EEG,Fs,'snr',1);
-
-% Incongruent
-rightLF1EEG = trialsepData.rightLF1EEG;
-rightLF2EEG = trialsepData.rightLF2EEG;
-leftRF1EEG = trialsepData.leftRF1EEG;
-leftRF2EEG = trialsepData.leftRF2EEG;
-
-[~,rightLF1SNR] = plotSSR_mod(rightLF1EEG,Fs,'snr',1);
-[~,rightLF2SNR] = plotSSR_mod(rightLF2EEG,Fs,'snr',1);
-[~,leftRF1SNR] = plotSSR_mod(leftRF1EEG,Fs,'snr',1);
-[~,leftRF2SNR] = plotSSR_mod(leftRF2EEG,Fs,'snr',1);
-
-close all;
+%% Segment by condition
+[redF1EEG,redF2EEG,greenF1EEG,greenF2EEG] = extractTrialType(EEG1,TrialData,actualfreq1,actualfreq2,badtrials);
+[redF1EEG(:,:,33:64),redF2EEG(:,:,33:64),greenF1EEG(:,:,33:64),greenF2EEG(:,:,33:64)] = extractTrialType(EEG2,TrialData,actualfreq1,actualfreq2,badtrials);
 
 %% 
-oChans = 30:32;
-poChans = [29 55:58 63:64];
-pChans = [24:28 51:54];
-cpChans = [20:23 48:50];
-targChans = [oChans poChans cpChans];
+parietalChans = [29 55:58 63:64];
+occpChans = 30:32;
 
-%% Congruent Channel Mean
-limit = 8;
-
+%% Plot SSR
 figure;
+
 subplot(2,2,1)
-hold on
-plot(bin,mean(rightRF1SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(rightRF1SNR(:,targChans),2),std(rightRF1SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Congruent Right at %sHz',num2str(freqs(1))),'FontSize',24)
+[bin,RF1] = plotSSR_mod(redF1EEG(:,[occpChans parietalChans],:),Fs);
+title(sprintf('Blue Freq %s SSR',num2str(actualfreq1)))
+xlim([0 40])
+ylim([0 1.5])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
 subplot(2,2,2)
-hold on 
-plot(bin,mean(rightRF2SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(rightRF2SNR(:,targChans),2),std(rightRF2SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Congruent Right at %sHz',num2str(freqs(2))),'FontSize',24)
+[~,RF2] = plotSSR_mod(redF2EEG(:,[occpChans parietalChans],:),Fs);
+title(sprintf('Blue Freq %s SSR',num2str(actualfreq2)))
+xlim([0 40])
+ylim([0 1.5])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
 subplot(2,2,3)
-hold on
-plot(bin,mean(leftLF1SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(leftLF1SNR(:,targChans),2),std(leftLF1SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Congruent Left at %sHz',num2str(freqs(1))),'FontSize',24)
+[~,GF1] = plotSSR_mod(greenF1EEG(:,[occpChans parietalChans],:),Fs);
+title(sprintf('Green Freq %s SSR',num2str(actualfreq1)))
+xlim([0 40])
+ylim([0 1.5])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
 subplot(2,2,4)
-hold on
-plot(bin,mean(leftLF2SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(leftLF2SNR(:,targChans),2),std(leftLF2SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Congruent Left at %sHz',num2str(freqs(2))),'FontSize',24)
+[~,GF2] = plotSSR_mod(greenF2EEG(:,[occpChans parietalChans],:),Fs);
+title(sprintf('Green Freq %s SSR',num2str(actualfreq2)))
+xlim([0 40])
+ylim([0 1.5])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
-%% Incongruent Channel Mean
+%% Plot SSR Chan means
 figure;
+
 subplot(2,2,1)
-hold on
-plot(bin,mean(rightLF1SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(rightLF1SNR(:,targChans),2),std(rightLF1SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Incongruent Right at %sHz',num2str(freqs(1))),'FontSize',24)
+meanRF1 = mean(RF1,2);
+plot(bin,meanRF1);
+title(sprintf('Blue Freq %s SSR',num2str(actualfreq1)))
+xlim([0 40])
+ylim([0 1])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
 subplot(2,2,2)
-hold on
-plot(bin,mean(rightLF2SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(rightLF2SNR(:,targChans),2),std(rightLF2SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Incongruent Right at %sHz',num2str(freqs(2))),'FontSize',24)
+meanRF2 = mean(RF2,2);
+plot(bin,meanRF2);
+title(sprintf('Blue Freq %s SSR',num2str(actualfreq2)))
+xlim([0 40])
+ylim([0 1])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
 subplot(2,2,3)
-hold on
-plot(bin,mean(leftRF1SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(leftRF1SNR(:,targChans),2),std(leftRF1SNR(:,targChans),[],2))
-xlim([4 40])
-ylim([0 limit])
-title(sprintf('Incongruent Left at %sHz',num2str(freqs(1))),'FontSize',24)
+meanGF1 = mean(GF1,2);
+plot(bin,meanGF1);
+title(sprintf('Green Freq %s SSR',num2str(actualfreq1)))
+xlim([0 40])
+ylim([0 1])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
 
 subplot(2,2,4)
-hold on
-plot(bin,mean(leftRF2SNR(:,targChans),2),'k','LineWidth',1)
-shadedErrorBar(bin,mean(leftRF2SNR(:,targChans),2),std(leftRF2SNR(:,targChans),[],2))
+meanGF2 = mean(GF2,2);
+plot(bin,meanGF2);
+title(sprintf('Green Freq %s SSR',num2str(actualfreq2)))
+xlim([0 40])
+ylim([0 1])
+line([12.5 12.5],[0 1.5],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 1.5],'LineStyle','--','Color','k')
+
+
+%% Plot SNR
+figure;
+
+subplot(2,2,1)
+plotSSR(redF1EEG(:,[occpChans parietalChans],:),Fs,'snr',1,'snrwidth',4)
+title(sprintf('Blue Freq %s SNR',num2str(actualfreq1)))
 xlim([4 40])
-ylim([0 limit])
-title(sprintf('Incongruent Left at %sHz',num2str(freqs(2))),'FontSize',24)
+ylim([0 10])
+line([12.5 12.5],[0 10],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 10],'LineStyle','--','Color','k')
+
+subplot(2,2,2)
+plotSSR(redF2EEG(:,[occpChans parietalChans],:),Fs,'snr',1,'snrwidth',4)
+title(sprintf('Blue Freq %s SNR',num2str(actualfreq2)))
+xlim([4 40])
+ylim([0 10])
+line([12.5 12.5],[0 10],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 10],'LineStyle','--','Color','k')
+
+subplot(2,2,3)
+plotSSR(greenF1EEG(:,[occpChans parietalChans],:),Fs,'snr',1,'snrwidth',4)
+title(sprintf('Green Freq %s SNR',num2str(actualfreq1)))
+xlim([4 40])
+ylim([0 10])
+line([12.5 12.5],[0 10],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 10],'LineStyle','--','Color','k')
+
+subplot(2,2,4)
+plotSSR(greenF2EEG(:,[occpChans parietalChans],:),Fs,'snr',1,'snrwidth',4)
+title(sprintf('Green Freq %s SNR',num2str(actualfreq2)))
+xlim([4 40])
+ylim([0 10])
+line([12.5 12.5],[0 10],'LineStyle','--','Color','k')
+line([18.75 18.75],[0 10],'LineStyle','--','Color','k')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% cortspectra
+% RF1data = eegica;
+% RF2data = eegica;
+% GF1data = eegica;
+% GF2data = eegica;
+% 
+% RF1data.data = RF1data.data(:,:,RF1);
+% RF2data.data = RF2data.data(:,:,RF2);
+% GF1data.data = GF1data.data(:,:,GF1);
+% GF2data.data = GF2data.data(:,:,GF2);
+% 
+% %
+% cohdata = cortspectra(RF1data);
+% 
+% % x = squeeze(cohdata.bandcoherence(2,31,:));
+% % figure;corttopo(x,cohdata.hm)
+% 
+% figure;plot(cohdata.freqs,cohdata.normpower)
+% 
+% x = find(round(cohdata.freqs,2) == 12.57);
+% y = squeeze(cohdata.coherence(x,[occpChans parietalChans],[occpChans parietalChans]));
+% figure;imagesc(y)
+
+
 
 
 

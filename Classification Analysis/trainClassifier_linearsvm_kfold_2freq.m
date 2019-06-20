@@ -1,4 +1,4 @@
-function [trainedClassifier, validationAccuracy, validationScores] = trainClassifier(trainingData)
+function [trainedClassifier, partitionedModel, validationAccuracy, validationPredictions, validationScores] = trainClassifier(trainingData)
 % trainClassifier(trainingData)
 %  returns a trained classifier and its accuracy.
 %  This code recreates the classification model trained in

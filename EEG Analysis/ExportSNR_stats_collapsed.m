@@ -24,15 +24,22 @@ for i = 1:length(names)
     TrialData = Data.(names{i}).TrialData;
     
     % Split each trial's EEG data into two 4s chunks
-    EEG = SegmentedEEG(Fs*2:end-Fs-1,:,:);
+    EEG1 = SegmentedEEG(1:Fs*4,:,:);
+    EEG2 = SegmentedEEG(Fs*4+1:Fs*8,:,:);
     badtrials = 0;
     
     % Segment by condition
-    [redF1EEG,redF2EEG,greenF1EEG,greenF2EEG] = extractTrialType(EEG,TrialData,actualfreq1,actualfreq2,badtrials);
+    [redF1EEG,redF2EEG,greenF1EEG,greenF2EEG] = extractTrialType(EEG1,TrialData,actualfreq1,actualfreq2,badtrials);
     F1EEG(:,:,1:32) = redF1EEG;
     F1EEG(:,:,33:64) = greenF1EEG;
     F2EEG(:,:,1:32) = redF2EEG;
     F2EEG(:,:,33:64) = greenF2EEG;
+    
+    [redF1EEG(:,:,33:64),redF2EEG(:,:,33:64),greenF1EEG(:,:,33:64),greenF2EEG(:,:,33:64)] = extractTrialType(EEG2,TrialData,actualfreq1,actualfreq2,badtrials);
+    F1EEG(:,:,65:96) = redF1EEG(:,:,33:64);
+    F1EEG(:,:,97:128) = greenF1EEG(:,:,33:64);
+    F2EEG(:,:,65:96) = redF2EEG(:,:,33:64);
+    F2EEG(:,:,97:128) = greenF2EEG(:,:,33:64);
     
     % SNR
     [bin,F1SNR] = plotSSR_mod(F1EEG(:,[occpChans parietalChans],:),Fs,'snr',1,'snrwidth',4);
@@ -81,7 +88,7 @@ end
 
 %% Save as mat file
 disp('Saving data...')
-save('AllSNRData_collapsed','SNRdata','allSNR','-v7.3')
+save('SNRDataStats_collapsed','SNRdata','allSNR','-v7.3')
 
 %% Save as CSV file
 writetable(allSNR,'Final Data Files/SNRData_collapsed.csv')

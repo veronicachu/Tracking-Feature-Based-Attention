@@ -1,5 +1,5 @@
 clear;
-load('TrialClassification_2freq_topchans.mat')
+load('TrialClassification_fulllength_topchans.mat')
 
 % Number of subjects
 names = fieldnames(classifyData);
